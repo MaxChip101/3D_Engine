@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -57,7 +58,7 @@ public class Main {
     static int screenWidth;
     static int screenHeight;
 
-    static Camera camera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
+    static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
 
     static D3Obj obj1 = new D3Obj(new Prism(250, 0, 1000, 10, 10, 10), new Color(0, 0, 255));
     static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), new Color(255, 0, 255));
@@ -68,16 +69,7 @@ public class Main {
     static D3Obj obj7 = new D3Obj(new Prism(-250, 500, 1000, 10, 10, 10), new Color(0, 255, 255));
     static D3Obj obj8 = new D3Obj(new Prism(-250, 500, 1500, 10, 10, 10), new Color(150, 0, 200));
 
-
-    static BeanObj renderedobj1 = buildProjectedObject(camera, obj1);
-    static BeanObj renderedobj2 = buildProjectedObject(camera, obj2);
-    static BeanObj renderedobj3 = buildProjectedObject(camera, obj3);
-    static BeanObj renderedobj4 = buildProjectedObject(camera, obj4);
-    static BeanObj renderedobj5 = buildProjectedObject(camera, obj5);
-    static BeanObj renderedobj6 = buildProjectedObject(camera, obj6);
-    static BeanObj renderedobj7 = buildProjectedObject(camera, obj7);
-    static BeanObj renderedobj8 = buildProjectedObject(camera, obj8);
-
+    static ArrayList<D3Obj> objects = new ArrayList<>();
 
     static void start() {
 
@@ -105,17 +97,19 @@ public class Main {
         key.registerKey(KeyEvent.VK_E);
         key.registerKey(KeyEvent.VK_Z);
 
+        objects.add(obj1);
+        objects.add(obj2);
+        objects.add(obj3);
+        objects.add(obj4);
+        objects.add(obj5);
+        objects.add(obj6);
+        objects.add(obj7);
+        objects.add(obj8);
 
-        graphics.objects.add(renderedobj1);
-        graphics.objects.add(renderedobj2);
-        graphics.objects.add(renderedobj3);
-        graphics.objects.add(renderedobj4);
-        graphics.objects.add(renderedobj5);
-        graphics.objects.add(renderedobj6);
-        graphics.objects.add(renderedobj7);
-        graphics.objects.add(renderedobj8);
 
     }
+
+
 
 
 
@@ -124,58 +118,58 @@ public class Main {
         screenHeight = frame.getBounds().height;
 
         if (key.keys.get(KeyEvent.VK_A)) {
-            camera.position.z += -5 * Math.sin(Math.toRadians(camera.rotation.y));
-            camera.position.x += -5 * Math.cos(Math.toRadians(camera.rotation.y));
+            gameCamera.position.z += -5 * Math.sin(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.x += -5 * Math.cos(Math.toRadians(gameCamera.rotation.y));
         }
         if (key.keys.get(KeyEvent.VK_D)) {
-            camera.position.z += 5 * Math.sin(Math.toRadians(camera.rotation.y));
-            camera.position.x += 5 * Math.cos(Math.toRadians(camera.rotation.y));
+            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y));
         }
         if (key.keys.get(KeyEvent.VK_W)) {
-            camera.position.z += 5 * Math.sin(Math.toRadians(camera.rotation.y + 90));
-            camera.position.x += 5 * Math.cos(Math.toRadians(camera.rotation.y + 90));
+            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y + 90));
+            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y + 90));
         }
         if (key.keys.get(KeyEvent.VK_S)) {
-            camera.position.z += 5 * Math.sin(Math.toRadians(camera.rotation.y - 90));
-            camera.position.x += 5 * Math.cos(Math.toRadians(camera.rotation.y - 90));
+            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y - 90));
+            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y - 90));
         }
         if (key.keys.get(KeyEvent.VK_LEFT)) {
-            camera.rotation.y += 1;
+            gameCamera.rotation.y += 1;
         }
         if (key.keys.get(KeyEvent.VK_RIGHT)) {
-            camera.rotation.y -= 1;
+            gameCamera.rotation.y -= 1;
         }
         if (key.keys.get(KeyEvent.VK_I)) {
-            camera.dts += 5;
+            gameCamera.dts += 5;
         }
         if (key.keys.get(KeyEvent.VK_O)) {
-            camera.dts -= 5;
+            gameCamera.dts -= 5;
         }
         if (key.keys.get(KeyEvent.VK_UP)) {
-            camera.rotation.x += 1;
+            gameCamera.rotation.x += 1;
         }
         if (key.keys.get(KeyEvent.VK_DOWN)) {
-            camera.rotation.x -= 1;
+            gameCamera.rotation.x -= 1;
         }
         if (key.keys.get(KeyEvent.VK_E)) {
-            camera.position.y += 10;
+            gameCamera.position.y += 10;
         }
         if (key.keys.get(KeyEvent.VK_Q)) {
-            camera.position.y -= 10;
+            gameCamera.position.y -= 10;
         }
         if (key.keys.get(KeyEvent.VK_Z)) {
             obj1.bounds.y += 5;
         }
 
-        renderedobj1 = buildProjectedObject(camera, obj1);
-        renderedobj2 = buildProjectedObject(camera, obj2);
-        renderedobj3 = buildProjectedObject(camera, obj3);
-        renderedobj4 = buildProjectedObject(camera, obj4);
-        renderedobj5 = buildProjectedObject(camera, obj5);
-        renderedobj6 = buildProjectedObject(camera, obj6);
-        renderedobj7 = buildProjectedObject(camera, obj7);
-        renderedobj8 = buildProjectedObject(camera, obj8);
+        renderObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
+    }
+
+    static void renderObjects(D3Obj[] objects, Camera camera) {
+        for (D3Obj obj : objects) {
+            obj.rendered = buildProjectedObject(camera, obj);
+            graphics.objects.add(obj.rendered);
+        }
     }
 
     static BeanObj buildProjectedObject(Camera camera, D3Obj object) {
