@@ -57,7 +57,7 @@ public class Main {
     static int screenWidth;
     static int screenHeight;
 
-    static Camera camera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000, 960 / 620);
+    static Camera camera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
 
     static D3Obj obj1 = new D3Obj(new Prism(250, 0, 1000, 10, 10, 10), new Color(0, 0, 255));
     static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), new Color(255, 0, 255));
@@ -101,6 +101,9 @@ public class Main {
         key.registerKey(KeyEvent.VK_S);
         key.registerKey(KeyEvent.VK_O);
         key.registerKey(KeyEvent.VK_I);
+        key.registerKey(KeyEvent.VK_Q);
+        key.registerKey(KeyEvent.VK_E);
+        key.registerKey(KeyEvent.VK_Z);
 
 
         graphics.objects.add(renderedobj1);
@@ -154,6 +157,15 @@ public class Main {
         if (key.keys.get(KeyEvent.VK_DOWN)) {
             camera.rotation.x -= 1;
         }
+        if (key.keys.get(KeyEvent.VK_E)) {
+            camera.position.y += 10;
+        }
+        if (key.keys.get(KeyEvent.VK_Q)) {
+            camera.position.y -= 10;
+        }
+        if (key.keys.get(KeyEvent.VK_Z)) {
+            obj1.bounds.y += 5;
+        }
 
         renderedobj1 = buildProjectedObject(camera, obj1);
         renderedobj2 = buildProjectedObject(camera, obj2);
@@ -183,7 +195,7 @@ public class Main {
 
         double rotatedX = position.z * camYSin + position.x * camYCos;
         double rotatedZ = position.z * camYCos - position.x * camYSin;
-        double rotatedY = rotatedZ * camXSin - position.y * camXCos;
+        double rotatedY = rotatedZ * camXSin + position.y * camXCos;
         rotatedZ = rotatedZ * camXCos - position.y * camXSin;
 
 
