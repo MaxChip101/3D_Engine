@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
@@ -60,14 +64,14 @@ public class Main {
 
     static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
 
-    static D3Obj obj1 = new D3Obj(new Prism(250, 0, 1000, 10, 10, 10), new Color(0, 0, 255));
-    static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), new Color(255, 0, 255));
-    static D3Obj obj3 = new D3Obj(new Prism(-250, 0, 1000, 10, 10, 10), new Color(255, 255, 0));
-    static D3Obj obj4 = new D3Obj(new Prism(-250, 0, 1500, 10, 10, 10), new Color(0, 255, 0));
-    static D3Obj obj5 = new D3Obj(new Prism(250, 1000, 1000, 10, 10, 10), new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new Prism(250, 1000, 1500, 10, 10, 10), new Color(255, 0, 100));
-    static D3Obj obj7 = new D3Obj(new Prism(-250, 1000, 1000, 10, 10, 10), new Color(0, 255, 255));
-    static D3Obj obj8 = new D3Obj(new Prism(-250, 1000, 1500, 10, 10, 10), new Color(150, 0, 200));
+    static D3Obj obj1 = new D3Obj(new Prism(250, 0, 1000, 10, 10, 10), "fillOval", new Color(0, 0, 255));
+    static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), "fillRect", new Color(255, 0, 255));
+    static D3Obj obj3 = new D3Obj(new Prism(-250, 0, 1000, 10, 10, 10), "fillOval", new Color(255, 255, 0));
+    static D3Obj obj4 = new D3Obj(new Prism(-250, 0, 1500, 10, 10, 10), "fillOval", new Color(0, 255, 0));
+    static D3Obj obj5 = new D3Obj(new Prism(250, 1000, 1000, 10, 10, 10), "fillRect", new Color(255, 55, 0));
+    static D3Obj obj6 = new D3Obj(new Prism(250, 1000, 1500, 10, 10, 10), "fillRect", new Color(255, 0, 100));
+    static D3Obj obj7 = new D3Obj(new Prism(-250, 1000, 1000, 10, 10, 10), "fillOval", new Color(0, 255, 255));
+    static D3Obj obj8 = new D3Obj(new Prism(-250, 1000, 1500, 10, 10, 10), "img",new Color(150, 0, 200));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
 
@@ -106,11 +110,20 @@ public class Main {
         objects.add(obj7);
         objects.add(obj8);
 
+        updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
+
+        graphics.objects.add(obj1.rendered);
+        graphics.objects.add(obj2.rendered);
+        graphics.objects.add(obj3.rendered);
+        graphics.objects.add(obj4.rendered);
+        graphics.objects.add(obj5.rendered);
+        graphics.objects.add(obj6.rendered);
+        graphics.objects.add(obj7.rendered);
+        graphics.objects.add(obj8.rendered);
+
+        obj8.image = pathToBufferedImage("res/img/icon.jpg");
 
     }
-
-
-
 
 
     static void update() {
@@ -161,22 +174,34 @@ public class Main {
             obj1.bounds.y += 5;
         }
 
-        renderObjects(objects.toArray(D3Obj[]::new), gameCamera);
+        updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
     }
 
-    static void renderObjects(D3Obj[] objects, Camera camera) {
+    static BufferedImage pathToBufferedImage(String path) {
+        File file = new File(path);
+        try {
+            BufferedImage image = ImageIO.read(file);
+            return image;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void updateObjects(D3Obj[] objects, Camera camera) {
         for (D3Obj obj : objects) {
-            graphics.objects.remove(obj);
             obj.rendered = buildProjectedObject(camera, obj);
-                graphics.objects.add(obj.rendered);
         }
     }
 
     static BeanObj buildProjectedObject(Camera camera, D3Obj object) {
         BeanObj renderedObject = object.rendered;
         renderedObject.color = object.color;
-        renderedObject.shape = "fillRect";
+        renderedObject.image = object.image;
+        renderedObject.string = object.string;
+        renderedObject.font = object.font;
+        renderedObject.shape = object.shape;
         renderedObject.rotationOffset = new Point(0, 0);
         renderedObject.rotation = 0;
         renderedObject.lineThickness = 0;
@@ -200,9 +225,11 @@ public class Main {
         if (rotatedPositions.z != 0) {
             int distance = 100 * camera.dts / rotatedPositions.z;
             renderedObject.zindex = distance;
-            renderedObject.bounds = new Rectangle((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z, (rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z, distance, distance);
-            double fixedRotation = 90 + Math.atan((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z));
-            renderedObject.rotation = (int) fixedRotation;
+            if (distance > 0) {
+                renderedObject.bounds = new Rectangle((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z, (rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z, distance, distance);
+                double fixedRotation = Math.atan((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z));
+                renderedObject.rotation = (int) fixedRotation;
+            }
         } else {
             renderedObject.bounds = new Rectangle(position.x, position.y, 0, 0);
         }
