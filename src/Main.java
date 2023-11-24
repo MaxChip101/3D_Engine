@@ -64,10 +64,10 @@ public class Main {
     static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), new Color(255, 0, 255));
     static D3Obj obj3 = new D3Obj(new Prism(-250, 0, 1000, 10, 10, 10), new Color(255, 255, 0));
     static D3Obj obj4 = new D3Obj(new Prism(-250, 0, 1500, 10, 10, 10), new Color(0, 255, 0));
-    static D3Obj obj5 = new D3Obj(new Prism(250, 500, 1000, 10, 10, 10), new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new Prism(250, 500, 1500, 10, 10, 10), new Color(255, 0, 100));
-    static D3Obj obj7 = new D3Obj(new Prism(-250, 500, 1000, 10, 10, 10), new Color(0, 255, 255));
-    static D3Obj obj8 = new D3Obj(new Prism(-250, 500, 1500, 10, 10, 10), new Color(150, 0, 200));
+    static D3Obj obj5 = new D3Obj(new Prism(250, 1000, 1000, 10, 10, 10), new Color(255, 55, 0));
+    static D3Obj obj6 = new D3Obj(new Prism(250, 1000, 1500, 10, 10, 10), new Color(255, 0, 100));
+    static D3Obj obj7 = new D3Obj(new Prism(-250, 1000, 1000, 10, 10, 10), new Color(0, 255, 255));
+    static D3Obj obj8 = new D3Obj(new Prism(-250, 1000, 1500, 10, 10, 10), new Color(150, 0, 200));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
 
@@ -167,8 +167,9 @@ public class Main {
 
     static void renderObjects(D3Obj[] objects, Camera camera) {
         for (D3Obj obj : objects) {
+            graphics.objects.remove(obj);
             obj.rendered = buildProjectedObject(camera, obj);
-            graphics.objects.add(obj.rendered);
+                graphics.objects.add(obj.rendered);
         }
     }
 
