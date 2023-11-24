@@ -4,7 +4,6 @@ public class D3Obj {
 
     Prism bounds;
     Color color;
-    int zindex;
     BeanObj rendered = new BeanObj();
 
     D3Obj(Prism bounds, Color color) {
