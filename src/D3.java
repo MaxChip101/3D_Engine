@@ -1,8 +1,8 @@
 public class D3 {
 
-    int x, y, z;
+    float x, y, z;
 
-    D3(int x, int y, int z) {
+    D3(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
