@@ -62,6 +62,8 @@ public class Main {
     static int screenWidth;
     static int screenHeight;
 
+    static D3Renderer renderer = new D3Renderer();
+
     static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 100, 1000);
 
     static D3Obj obj1 = new D3Obj(new Prism(500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
@@ -130,12 +132,14 @@ public class Main {
     }
 
     static boolean mouseCam = false;
+    static float mouseSensitivity = 0.1f;
+
 
     static void update() {
         screenWidth = frame.getBounds().width;
         screenHeight = frame.getBounds().height;
 
-        gameCamera.fov = screenWidth + screenHeight;
+        gameCamera.dts = screenWidth + screenHeight - 500;
 
         if (gameCamera.rotation.x < -90) {
             gameCamera.rotation.x = -90;
@@ -166,10 +170,10 @@ public class Main {
             gameCamera.rotation.y -= 1;
         }
         if (key.keys.get(KeyEvent.VK_I)) {
-            gameCamera.fov += 5;
+            gameCamera.dts += 5;
         }
         if (key.keys.get(KeyEvent.VK_O)) {
-            gameCamera.fov -= 5;
+            gameCamera.dts -= 5;
         }
         if (key.keys.get(KeyEvent.VK_UP)) {
             gameCamera.rotation.x += 1;
@@ -195,8 +199,8 @@ public class Main {
 
         if (mouseCam) {
             mouse.MoveCursor(new Point(frame.getX() + screenWidth / 2, frame.getY() + screenHeight / 2));
-            gameCamera.rotation.y += screenWidth / 2 - mouseX;
-            gameCamera.rotation.x += screenHeight / 2 - mouseY;
+            gameCamera.rotation.y += (screenWidth / 2 - mouseX) * mouseSensitivity;
+            gameCamera.rotation.x += (screenHeight / 2 - mouseY) * mouseSensitivity;
         }
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
@@ -216,56 +220,8 @@ public class Main {
 
     static void updateObjects(D3Obj[] objects, Camera camera) {
         for (D3Obj obj : objects) {
-            obj.rendered = buildProjectedObject(camera, obj);
+            obj.rendered = renderer.renderObject(camera, obj);
         }
-    }
-
-
-    static BeanObj buildProjectedObject(Camera camera, D3Obj object) {
-        BeanObj renderedObject = object.rendered;
-        renderedObject.color = object.color;
-        renderedObject.image = object.image;
-        renderedObject.string = object.string;
-        renderedObject.font = object.font;
-        renderedObject.shape = object.shape;
-        renderedObject.rotationOffset = new Point(0, 0);
-        renderedObject.rotation = 0;
-        renderedObject.lineThickness = 0;
-
-        D3 position = new D3(object.bounds.x - camera.position.x, -object.bounds.y - (-camera.position.y), object.bounds.z - camera.position.z);
-
-        double camYSin = Math.sin(Math.toRadians(camera.rotation.y));
-        double camYCos = Math.cos(Math.toRadians(camera.rotation.y));
-        double camXSin = Math.sin(Math.toRadians(camera.rotation.x));
-        double camXCos = Math.cos(Math.toRadians(camera.rotation.x));
-
-        double rotatedX = position.z * camYSin + position.x * camYCos;
-        double rotatedZ = position.z * camYCos - position.x * camYSin;
-        double rotatedY = rotatedZ * camXSin + position.y * camXCos;
-        rotatedZ = rotatedZ * camXCos - position.y * camXSin;
-
-
-
-        D3 rotatedPositions = new D3((int) rotatedX, (int) rotatedY , (int) rotatedZ);
-
-        if (rotatedPositions.z != 0) {
-            int distance = 100 * camera.fov / rotatedPositions.z;
-            renderedObject.zindex = distance;
-            if (distance > 0) {
-                renderedObject.bounds = new Rectangle((rotatedPositions.x / 2) * camera.fov / rotatedPositions.z, (rotatedPositions.y / 2) * camera.fov / rotatedPositions.z, distance, distance);
-                double fixedRotation = Math.atan((rotatedPositions.x / 2) * camera.fov / rotatedPositions.z) / (camera.fov / (camXSin / camXCos) - ((rotatedPositions.y / 2) * camera.fov / rotatedPositions.z));
-                renderedObject.rotation = (int) fixedRotation;
-            }
-        } else {
-            renderedObject.bounds = new Rectangle(position.x, position.y, 0, 0);
-        }
-
-        int screenWidthHalf = Main.screenWidth / 2;
-        int screenHeightHalf = Main.screenHeight / 2;
-        renderedObject.bounds.x += screenWidthHalf;
-        renderedObject.bounds.y += screenHeightHalf;
-
-        return renderedObject;
     }
 
 }
