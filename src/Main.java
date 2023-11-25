@@ -62,7 +62,7 @@ public class Main {
     static int screenWidth;
     static int screenHeight;
 
-    static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
+    static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 100, 1000);
 
     static D3Obj obj1 = new D3Obj(new Prism(500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
     static D3Obj obj2 = new D3Obj(new Prism(500, 0, 2000, 10, 10, 10), 0, "fillRect", new Color(255, 0, 255));
@@ -73,10 +73,7 @@ public class Main {
     static D3Obj obj7 = new D3Obj(new Prism(-500, 1000, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
     static D3Obj obj8 = new D3Obj(new Prism(-500, 1000, 2000, 10, 10, 10), 0, "img",new Color(150, 0, 200));
 
-    static D3Line line1 = new D3Line(new D3(100, 50, 100), new D3(500, 100, 500), 10, new Color(0, 0, 0));
-
     static ArrayList<D3Obj> objects = new ArrayList<>();
-    static ArrayList<D3Line> lines = new ArrayList<>();
 
     static void start() {
 
@@ -106,6 +103,8 @@ public class Main {
         key.registerKey(KeyEvent.VK_G);
         key.registerKey(KeyEvent.VK_F);
 
+
+
         objects.add(obj1);
         objects.add(obj2);
         objects.add(obj3);
@@ -128,12 +127,6 @@ public class Main {
 
         obj8.image = pathToBufferedImage("res/img/icon.jpg");
 
-        lines.add(line1);
-
-        updateLines(lines.toArray(D3Line[]::new), gameCamera);
-
-        graphics.objects.add(line1.rendered);
-
     }
 
     static boolean mouseCam = false;
@@ -141,6 +134,8 @@ public class Main {
     static void update() {
         screenWidth = frame.getBounds().width;
         screenHeight = frame.getBounds().height;
+
+        gameCamera.fov = screenWidth + screenHeight;
 
         if (gameCamera.rotation.x < -90) {
             gameCamera.rotation.x = -90;
@@ -171,10 +166,10 @@ public class Main {
             gameCamera.rotation.y -= 1;
         }
         if (key.keys.get(KeyEvent.VK_I)) {
-            gameCamera.dts += 5;
+            gameCamera.fov += 5;
         }
         if (key.keys.get(KeyEvent.VK_O)) {
-            gameCamera.dts -= 5;
+            gameCamera.fov -= 5;
         }
         if (key.keys.get(KeyEvent.VK_UP)) {
             gameCamera.rotation.x += 1;
@@ -205,7 +200,6 @@ public class Main {
         }
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
-        updateLines(lines.toArray(D3Line[]::new), gameCamera);
 
     }
 
@@ -226,32 +220,6 @@ public class Main {
         }
     }
 
-    static void updateLines(D3Line[] lines, Camera camera) {
-        for (D3Line line : lines) {
-            line.rendered = buildProjectedLine(camera, line);
-        }
-    }
-
-    static BeanObj buildProjectedLine(Camera camera, D3Line line) {
-        BeanObj renderedLine = line.rendered;
-        renderedLine.color = line.color;
-        renderedLine.shape = "ln";
-        renderedLine.rotationOffset = new Point(0, 0);
-        renderedLine.rotation = 0;
-        renderedLine.lineThickness = line.lineThickness;
-
-        D3 startPosition = new D3(line.startPosition.x - camera.position.x, -line.startPosition.y - (-camera.position.y), line.startPosition.z - camera.position.z);
-        D3 endPosition = new D3(line.endPosition.x - camera.position.x, -line.endPosition.y - (-camera.position.y), line.endPosition.z - camera.position.z);
-
-        int[] projectedStart = projectPoint(camera, startPosition);
-        int[] projectedEnd = projectPoint(camera, endPosition);
-
-        renderedLine.zindex = projectedStart[2] - projectedEnd[2];
-        renderedLine.bounds = new Rectangle(projectedStart[0], projectedStart[1], projectedEnd[0], projectedEnd[1]);
-
-
-        return renderedLine;
-    }
 
     static BeanObj buildProjectedObject(Camera camera, D3Obj object) {
         BeanObj renderedObject = object.rendered;
@@ -281,11 +249,11 @@ public class Main {
         D3 rotatedPositions = new D3((int) rotatedX, (int) rotatedY , (int) rotatedZ);
 
         if (rotatedPositions.z != 0) {
-            int distance = 100 * camera.dts / rotatedPositions.z;
+            int distance = 100 * camera.fov / rotatedPositions.z;
             renderedObject.zindex = distance;
             if (distance > 0) {
-                renderedObject.bounds = new Rectangle((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z, (rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z, distance, distance);
-                double fixedRotation = Math.atan((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z));
+                renderedObject.bounds = new Rectangle((rotatedPositions.x / 2) * camera.fov / rotatedPositions.z, (rotatedPositions.y / 2) * camera.fov / rotatedPositions.z, distance, distance);
+                double fixedRotation = Math.atan((rotatedPositions.x / 2) * camera.fov / rotatedPositions.z) / (camera.fov / (camXSin / camXCos) - ((rotatedPositions.y / 2) * camera.fov / rotatedPositions.z));
                 renderedObject.rotation = (int) fixedRotation;
             }
         } else {
@@ -299,44 +267,5 @@ public class Main {
 
         return renderedObject;
     }
-
-    static int[] projectPoint(Camera camera, D3 position) {
-        int[] projectedVariables = new int[4];
-        double camYSin = Math.sin(Math.toRadians(camera.rotation.y));
-        double camYCos = Math.cos(Math.toRadians(camera.rotation.y));
-        double camXSin = Math.sin(Math.toRadians(camera.rotation.x));
-        double camXCos = Math.cos(Math.toRadians(camera.rotation.x));
-
-        double rotatedX = position.z * camYSin + position.x * camYCos;
-        double rotatedZ = position.z * camYCos - position.x * camYSin;
-        double rotatedY = rotatedZ * camXSin + position.y * camXCos;
-        rotatedZ = rotatedZ * camXCos - position.y * camXSin;
-
-
-
-        D3 rotatedPositions = new D3((int) rotatedX, (int) rotatedY , (int) rotatedZ);
-
-        if (rotatedPositions.z != 0) {
-            int distance = 100 * camera.dts / rotatedPositions.z;
-            projectedVariables[2] = distance;
-            if (distance > 0) {
-                projectedVariables[0] = (rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z;
-                projectedVariables[1] = (rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z;
-                double fixedRotation = Math.atan((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z));
-                projectedVariables[3] = (int) fixedRotation;
-            }
-        } else {
-            projectedVariables[0] = position.x;
-            projectedVariables[1] = position.y;
-        }
-
-        int screenWidthHalf = Main.screenWidth / 2;
-        int screenHeightHalf = Main.screenHeight / 2;
-        projectedVariables[0] += screenWidthHalf;
-        projectedVariables[1] += screenHeightHalf;
-
-        return projectedVariables;
-    }
-
 
 }
