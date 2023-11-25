@@ -73,9 +73,7 @@ public class Main {
     static D3Obj obj7 = new D3Obj(new Prism(-500, 1000, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
     static D3Obj obj8 = new D3Obj(new Prism(-500, 1000, 2000, 10, 10, 10), 0, "img",new Color(150, 0, 200));
 
-    static D3Line line1 = new D3Line(new D3(100, 50, 100), new D3(300, 75, 300), 10, new Color(0, 0, 0));
-    static D3Obj objB = new D3Obj(new Prism(100, 50, 100, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
-    static D3Obj objE = new D3Obj(new Prism(300, 75, 300, 10, 10, 10), 0, "fillOval",new Color(255, 0, 0));
+    static D3Line line1 = new D3Line(new D3(100, 50, 100), new D3(500, 100, 500), 10, new Color(0, 0, 0));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
     static ArrayList<D3Line> lines = new ArrayList<>();
@@ -116,8 +114,6 @@ public class Main {
         objects.add(obj6);
         objects.add(obj7);
         objects.add(obj8);
-        objects.add(objB);
-        objects.add(objE);
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
@@ -129,8 +125,6 @@ public class Main {
         graphics.objects.add(obj6.rendered);
         graphics.objects.add(obj7.rendered);
         graphics.objects.add(obj8.rendered);
-        graphics.objects.add(objB.rendered);
-        graphics.objects.add(objE.rendered);
 
         obj8.image = pathToBufferedImage("res/img/icon.jpg");
 
@@ -252,7 +246,7 @@ public class Main {
         int[] projectedStart = projectPoint(camera, startPosition);
         int[] projectedEnd = projectPoint(camera, endPosition);
 
-        renderedLine.zindex = projectedStart[2] / projectedEnd[2];
+        renderedLine.zindex = projectedStart[2] - projectedEnd[2];
         renderedLine.bounds = new Rectangle(projectedStart[0], projectedStart[1], projectedEnd[0], projectedEnd[1]);
 
 
