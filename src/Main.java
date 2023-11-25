@@ -66,14 +66,14 @@ public class Main {
 
     static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 100, 1000);
 
-    static D3Obj obj1 = new D3Obj(new Prism(500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
-    static D3Obj obj2 = new D3Obj(new Prism(500, 0, 2000, 10, 10, 10), 0, "fillRect", new Color(255, 0, 255));
-    static D3Obj obj3 = new D3Obj(new Prism(-500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(255, 255, 0));
-    static D3Obj obj4 = new D3Obj(new Prism(-500, 0, 2000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 0));
-    static D3Obj obj5 = new D3Obj(new Prism(500, 1000, 1000, 10, 10, 10), 0, "fillRect", new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new Prism(500, 1000, 2000, 10, 10, 10), 0, "fillRect", new Color(255, 0, 100));
-    static D3Obj obj7 = new D3Obj(new Prism(-500, 1000, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
-    static D3Obj obj8 = new D3Obj(new Prism(-500, 1000, 2000, 10, 10, 10), 0, "img",new Color(150, 0, 200));
+    static D3Obj obj1 = new D3Obj(new D3(500, 0, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
+    static D3Obj obj2 = new D3Obj(new D3(500, 0, 2000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 0, 255));
+    static D3Obj obj3 = new D3Obj(new D3(-500, 0, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(255, 255, 0));
+    static D3Obj obj4 = new D3Obj(new D3(-500, 0, 2000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 255, 0));
+    static D3Obj obj5 = new D3Obj(new D3(500, 1000, 1000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 55, 0));
+    static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 0, 100));
+    static D3Obj obj7 = new D3Obj(new D3(-500, 1000, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
+    static D3Obj obj8 = new D3Obj(new D3(-500, 1000, 2000), new D3(10, 10, 10), 0, "img",new Color(150, 0, 200));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
 
@@ -188,7 +188,7 @@ public class Main {
             gameCamera.position.y -= 10;
         }
         if (key.keys.get(KeyEvent.VK_Z)) {
-            obj1.bounds.y += 5;
+            obj1.position.y += 5;
         }
         if (key.keys.get(KeyEvent.VK_F)) {
             mouseCam = true;
