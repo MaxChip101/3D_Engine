@@ -64,16 +64,21 @@ public class Main {
 
     static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 60, 300, 1000);
 
-    static D3Obj obj1 = new D3Obj(new Prism(250, 0, 1000, 10, 10, 10), "fillOval", new Color(0, 0, 255));
-    static D3Obj obj2 = new D3Obj(new Prism(250, 0, 1500, 10, 10, 10), "fillRect", new Color(255, 0, 255));
-    static D3Obj obj3 = new D3Obj(new Prism(-250, 0, 1000, 10, 10, 10), "fillOval", new Color(255, 255, 0));
-    static D3Obj obj4 = new D3Obj(new Prism(-250, 0, 1500, 10, 10, 10), "fillOval", new Color(0, 255, 0));
-    static D3Obj obj5 = new D3Obj(new Prism(250, 1000, 1000, 10, 10, 10), "fillRect", new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new Prism(250, 1000, 1500, 10, 10, 10), "fillRect", new Color(255, 0, 100));
-    static D3Obj obj7 = new D3Obj(new Prism(-250, 1000, 1000, 10, 10, 10), "fillOval", new Color(0, 255, 255));
-    static D3Obj obj8 = new D3Obj(new Prism(-250, 1000, 1500, 10, 10, 10), "img",new Color(150, 0, 200));
+    static D3Obj obj1 = new D3Obj(new Prism(500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
+    static D3Obj obj2 = new D3Obj(new Prism(500, 0, 2000, 10, 10, 10), 0, "fillRect", new Color(255, 0, 255));
+    static D3Obj obj3 = new D3Obj(new Prism(-500, 0, 1000, 10, 10, 10), 0, "fillOval", new Color(255, 255, 0));
+    static D3Obj obj4 = new D3Obj(new Prism(-500, 0, 2000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 0));
+    static D3Obj obj5 = new D3Obj(new Prism(500, 1000, 1000, 10, 10, 10), 0, "fillRect", new Color(255, 55, 0));
+    static D3Obj obj6 = new D3Obj(new Prism(500, 1000, 2000, 10, 10, 10), 0, "fillRect", new Color(255, 0, 100));
+    static D3Obj obj7 = new D3Obj(new Prism(-500, 1000, 1000, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
+    static D3Obj obj8 = new D3Obj(new Prism(-500, 1000, 2000, 10, 10, 10), 0, "img",new Color(150, 0, 200));
+
+    static D3Line line1 = new D3Line(new D3(100, 50, 100), new D3(300, 75, 300), 10, new Color(0, 0, 0));
+    static D3Obj objB = new D3Obj(new Prism(100, 50, 100, 10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
+    static D3Obj objE = new D3Obj(new Prism(300, 75, 300, 10, 10, 10), 0, "fillOval",new Color(255, 0, 0));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
+    static ArrayList<D3Line> lines = new ArrayList<>();
 
     static void start() {
 
@@ -100,6 +105,8 @@ public class Main {
         key.registerKey(KeyEvent.VK_Q);
         key.registerKey(KeyEvent.VK_E);
         key.registerKey(KeyEvent.VK_Z);
+        key.registerKey(KeyEvent.VK_G);
+        key.registerKey(KeyEvent.VK_F);
 
         objects.add(obj1);
         objects.add(obj2);
@@ -109,6 +116,8 @@ public class Main {
         objects.add(obj6);
         objects.add(obj7);
         objects.add(obj8);
+        objects.add(objB);
+        objects.add(objE);
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
@@ -120,15 +129,30 @@ public class Main {
         graphics.objects.add(obj6.rendered);
         graphics.objects.add(obj7.rendered);
         graphics.objects.add(obj8.rendered);
+        graphics.objects.add(objB.rendered);
+        graphics.objects.add(objE.rendered);
 
         obj8.image = pathToBufferedImage("res/img/icon.jpg");
 
+        lines.add(line1);
+
+        updateLines(lines.toArray(D3Line[]::new), gameCamera);
+
+        graphics.objects.add(line1.rendered);
+
     }
 
+    static boolean mouseCam = false;
 
     static void update() {
         screenWidth = frame.getBounds().width;
         screenHeight = frame.getBounds().height;
+
+        if (gameCamera.rotation.x < -90) {
+            gameCamera.rotation.x = -90;
+        } else if (gameCamera.rotation.x > 90) {
+            gameCamera.rotation.x = 90;
+        }
 
         if (key.keys.get(KeyEvent.VK_A)) {
             gameCamera.position.z += -5 * Math.sin(Math.toRadians(gameCamera.rotation.y));
@@ -173,8 +197,21 @@ public class Main {
         if (key.keys.get(KeyEvent.VK_Z)) {
             obj1.bounds.y += 5;
         }
+        if (key.keys.get(KeyEvent.VK_F)) {
+            mouseCam = true;
+        }
+        if (key.keys.get(KeyEvent.VK_G)) {
+            mouseCam = false;
+        }
+
+        if (mouseCam) {
+            mouse.MoveCursor(new Point(frame.getX() + screenWidth / 2, frame.getY() + screenHeight / 2));
+            gameCamera.rotation.y += screenWidth / 2 - mouseX;
+            gameCamera.rotation.x += screenHeight / 2 - mouseY;
+        }
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
+        updateLines(lines.toArray(D3Line[]::new), gameCamera);
 
     }
 
@@ -193,6 +230,33 @@ public class Main {
         for (D3Obj obj : objects) {
             obj.rendered = buildProjectedObject(camera, obj);
         }
+    }
+
+    static void updateLines(D3Line[] lines, Camera camera) {
+        for (D3Line line : lines) {
+            line.rendered = buildProjectedLine(camera, line);
+        }
+    }
+
+    static BeanObj buildProjectedLine(Camera camera, D3Line line) {
+        BeanObj renderedLine = line.rendered;
+        renderedLine.color = line.color;
+        renderedLine.shape = "ln";
+        renderedLine.rotationOffset = new Point(0, 0);
+        renderedLine.rotation = 0;
+        renderedLine.lineThickness = line.lineThickness;
+
+        D3 startPosition = new D3(line.startPosition.x - camera.position.x, -line.startPosition.y - (-camera.position.y), line.startPosition.z - camera.position.z);
+        D3 endPosition = new D3(line.endPosition.x - camera.position.x, -line.endPosition.y - (-camera.position.y), line.endPosition.z - camera.position.z);
+
+        int[] projectedStart = projectPoint(camera, startPosition);
+        int[] projectedEnd = projectPoint(camera, endPosition);
+
+        renderedLine.zindex = projectedStart[2] / projectedEnd[2];
+        renderedLine.bounds = new Rectangle(projectedStart[0], projectedStart[1], projectedEnd[0], projectedEnd[1]);
+
+
+        return renderedLine;
     }
 
     static BeanObj buildProjectedObject(Camera camera, D3Obj object) {
@@ -236,12 +300,48 @@ public class Main {
 
         int screenWidthHalf = Main.screenWidth / 2;
         int screenHeightHalf = Main.screenHeight / 2;
-        renderedObject.bounds.translate(screenWidthHalf, screenHeightHalf);
-
-        position.x += screenWidthHalf;
-        position.y += screenHeightHalf;
+        renderedObject.bounds.x += screenWidthHalf;
+        renderedObject.bounds.y += screenHeightHalf;
 
         return renderedObject;
+    }
+
+    static int[] projectPoint(Camera camera, D3 position) {
+        int[] projectedVariables = new int[4];
+        double camYSin = Math.sin(Math.toRadians(camera.rotation.y));
+        double camYCos = Math.cos(Math.toRadians(camera.rotation.y));
+        double camXSin = Math.sin(Math.toRadians(camera.rotation.x));
+        double camXCos = Math.cos(Math.toRadians(camera.rotation.x));
+
+        double rotatedX = position.z * camYSin + position.x * camYCos;
+        double rotatedZ = position.z * camYCos - position.x * camYSin;
+        double rotatedY = rotatedZ * camXSin + position.y * camXCos;
+        rotatedZ = rotatedZ * camXCos - position.y * camXSin;
+
+
+
+        D3 rotatedPositions = new D3((int) rotatedX, (int) rotatedY , (int) rotatedZ);
+
+        if (rotatedPositions.z != 0) {
+            int distance = 100 * camera.dts / rotatedPositions.z;
+            projectedVariables[2] = distance;
+            if (distance > 0) {
+                projectedVariables[0] = (rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z;
+                projectedVariables[1] = (rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z;
+                double fixedRotation = Math.atan((rotatedPositions.x - distance / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y - distance / 2) * camera.dts / rotatedPositions.z));
+                projectedVariables[3] = (int) fixedRotation;
+            }
+        } else {
+            projectedVariables[0] = position.x;
+            projectedVariables[1] = position.y;
+        }
+
+        int screenWidthHalf = Main.screenWidth / 2;
+        int screenHeightHalf = Main.screenHeight / 2;
+        projectedVariables[0] += screenWidthHalf;
+        projectedVariables[1] += screenHeightHalf;
+
+        return projectedVariables;
     }
 
 
