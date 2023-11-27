@@ -15,26 +15,29 @@ public class D3Renderer {
 
         D3 position = new D3 (object.position.x - camera.position.x, -object.position.y - (-camera.position.y), object.position.z - camera.position.z);
 
-        double camYSin = Math.sin(Math.toRadians(camera.rotation.y));
-        double camYCos = Math.cos(Math.toRadians(camera.rotation.y));
-        double camXSin = Math.sin(Math.toRadians(camera.rotation.x));
-        double camXCos = Math.cos(Math.toRadians(camera.rotation.x));
+        double camYSin = -Math.sin(Math.toRadians(camera.rotation.y));
+        double camYCos = -Math.cos(Math.toRadians(camera.rotation.y));
+        double camXSin = -Math.sin(Math.toRadians(camera.rotation.x));
+        double camXCos = -Math.cos(Math.toRadians(camera.rotation.x));
+        double camZSin = -Math.sin(Math.toRadians(camera.rotation.z));
+        double camZCos = -Math.cos(Math.toRadians(camera.rotation.z));
 
         double rotatedX = position.z * camYSin + position.x * camYCos;
         double rotatedZ = position.z * camYCos - position.x * camYSin;
-        double rotatedY = rotatedZ * camXSin + position.y * camXCos;
-        rotatedZ = rotatedZ * camXCos - position.y * camXSin;
+        double tempY = position.y * camXCos - rotatedZ * camXSin;
+        double finalRotatedY = tempY * camZCos - rotatedX * camZSin;
+        double finalRotatedX = tempY * camZSin + rotatedX * camZCos;
+        double finalRotatedZ = position.y * camXSin + rotatedZ * camXCos;
 
 
-
-        D3 rotatedPositions = new D3((int) rotatedX, (int) rotatedY , (int) rotatedZ);
+        D3 rotatedPositions = new D3((int) finalRotatedX, (int) finalRotatedY , (int) finalRotatedZ);
 
         if (rotatedPositions.z != 0) {
             float distance = 100 * camera.dts / rotatedPositions.z;
             renderedObject.zindex = (int) distance;
             if (distance > 0) {
                 renderedObject.bounds = new Rectangle(((int) rotatedPositions.x / 2) * (int) camera.dts / (int) rotatedPositions.z, ((int) rotatedPositions.y / 2) * (int) camera.dts / (int) rotatedPositions.z, (int) distance, (int) distance);
-                double fixedRotation = Math.atan((rotatedPositions.x / 2) * camera.dts / rotatedPositions.z) / (camera.dts / (camXSin / camXCos) - ((rotatedPositions.y / 2) * camera.dts / rotatedPositions.z));
+                double fixedRotation = Math.atan(renderedObject.bounds.x / (camera.dts / (camXSin / camXCos)) - renderedObject.bounds.y);
                 renderedObject.rotation = (int) fixedRotation;
             }
         } else {
