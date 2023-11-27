@@ -74,6 +74,7 @@ public class Main {
     static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 0, 100));
     static D3Obj obj7 = new D3Obj(new D3(-500, 1000, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
     static D3Obj obj8 = new D3Obj(new D3(-500, 1000, 2000), new D3(10, 10, 10), 0, "img",new Color(150, 0, 200));
+    static D3Obj obj9 = new D3Obj(new D3(-500, 1000, 1500), new D3(10, 10, 10), 0, "fillRect" ,new Color(150, 50, 200));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
 
@@ -105,29 +106,19 @@ public class Main {
         key.registerKey(KeyEvent.VK_G);
         key.registerKey(KeyEvent.VK_F);
 
-
-
-        objects.add(obj1);
-        objects.add(obj2);
-        objects.add(obj3);
-        objects.add(obj4);
-        objects.add(obj5);
-        objects.add(obj6);
-        objects.add(obj7);
-        objects.add(obj8);
-
-        updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
-
-        graphics.objects.add(obj1.rendered);
-        graphics.objects.add(obj2.rendered);
-        graphics.objects.add(obj3.rendered);
-        graphics.objects.add(obj4.rendered);
-        graphics.objects.add(obj5.rendered);
-        graphics.objects.add(obj6.rendered);
-        graphics.objects.add(obj7.rendered);
-        graphics.objects.add(obj8.rendered);
+        addObject(obj1, objects, gameCamera);
+        addObject(obj2, objects, gameCamera);
+        addObject(obj3, objects, gameCamera);
+        addObject(obj4, objects, gameCamera);
+        addObject(obj5, objects, gameCamera);
+        addObject(obj6, objects, gameCamera);
+        addObject(obj7, objects, gameCamera);
+        addObject(obj8, objects, gameCamera);
+        addObject(obj9, objects, gameCamera);
 
         obj8.image = pathToBufferedImage("res/img/icon.jpg");
+
+        updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
     }
 
@@ -170,10 +161,10 @@ public class Main {
             gameCamera.rotation.y -= 1;
         }
         if (key.keys.get(KeyEvent.VK_I)) {
-            gameCamera.dts += 5;
+            gameCamera.rotation.z += 1;
         }
         if (key.keys.get(KeyEvent.VK_O)) {
-            gameCamera.dts -= 5;
+            gameCamera.rotation.z -= 1;
         }
         if (key.keys.get(KeyEvent.VK_UP)) {
             gameCamera.rotation.x += 1;
@@ -188,7 +179,7 @@ public class Main {
             gameCamera.position.y -= 10;
         }
         if (key.keys.get(KeyEvent.VK_Z)) {
-            obj1.position.y += 5;
+            obj1.position.y += 1;
         }
         if (key.keys.get(KeyEvent.VK_F)) {
             mouseCam = true;
@@ -216,6 +207,12 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static void addObject(D3Obj object, ArrayList<D3Obj> objects, Camera camera) {
+        objects.add(object);
+        renderer.renderObject(camera, object);
+        graphics.objects.add(object.rendered);
     }
 
     static void updateObjects(D3Obj[] objects, Camera camera) {
