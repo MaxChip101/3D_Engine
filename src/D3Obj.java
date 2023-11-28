@@ -4,7 +4,8 @@ import java.awt.image.BufferedImage;
 public class D3Obj {
 
     D3 position;
-    D3 size;
+    Point size;
+    D3Hitbox hitbox;
     float rotation;
     Color color;
     BufferedImage image;
@@ -14,7 +15,7 @@ public class D3Obj {
 
     BeanObj rendered = new BeanObj();
 
-    D3Obj(D3 position, D3 size, float rotation, String shape, Color color) {
+    D3Obj(D3 position, Point size, float rotation, String shape, Color color) {
         this.position = position;
         this.size = size;
         this.rotation = rotation;
