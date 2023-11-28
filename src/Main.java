@@ -66,15 +66,15 @@ public class Main {
 
     static Camera gameCamera = new Camera(new D3(0, 200, 0), new D3(0, 0, 0), 100, 1000);
 
-    static D3Obj obj1 = new D3Obj(new D3(500, 0, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 0, 255));
-    static D3Obj obj2 = new D3Obj(new D3(500, 0, 2000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 0, 255));
-    static D3Obj obj3 = new D3Obj(new D3(-500, 0, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(255, 255, 0));
-    static D3Obj obj4 = new D3Obj(new D3(-500, 0, 2000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 255, 0));
-    static D3Obj obj5 = new D3Obj(new D3(500, 1000, 1000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new D3(10, 10, 10), 0, "fillRect", new Color(255, 0, 100));
-    static D3Obj obj7 = new D3Obj(new D3(-500, 1000, 1000), new D3(10, 10, 10), 0, "fillOval", new Color(0, 255, 255));
-    static D3Obj obj8 = new D3Obj(new D3(-500, 1000, 2000), new D3(10, 10, 10), 0, "img",new Color(150, 0, 200));
-    static D3Obj obj9 = new D3Obj(new D3(-500, 1000, 1500), new D3(10, 10, 10), 0, "fillRect" ,new Color(150, 50, 200));
+    static D3Obj obj1 = new D3Obj(new D3(500, 0, 1000), new Point(100, 100), 0, "fillOval", new Color(0, 0, 255));
+    static D3Obj obj2 = new D3Obj(new D3(500, 0, 2000), new Point(100, 100), 0, "fillRect", new Color(255, 0, 255));
+    static D3Obj obj3 = new D3Obj(new D3(-500, 0, 1000), new Point(100, 100), 0, "fillOval", new Color(255, 255, 0));
+    static D3Obj obj4 = new D3Obj(new D3(-500, 0, 2000), new Point(100, 100), 0, "fillOval", new Color(0, 255, 0));
+    static D3Obj obj5 = new D3Obj(new D3(500, 1000, 1000), new Point(100, 100), 0, "fillRect", new Color(255, 55, 0));
+    static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new Point(1000, 100), 0, "fillRect", new Color(255, 0, 100));
+    static D3Obj obj7 = new D3Obj(new D3(-500, 1000, 1000), new Point(100, 100), 0, "str", new Color(0, 255, 255));
+    static D3Obj obj8 = new D3Obj(new D3(-500, 1000, 2000), new Point(100, 100), 0, "img",new Color(150, 0, 200));
+    static D3Obj obj9 = new D3Obj(new D3(-500, 1000, 1500), new Point(100, 100), 0, "fillRect" ,new Color(150, 50, 200));
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
 
@@ -116,6 +116,9 @@ public class Main {
         addObject(obj8, objects, gameCamera);
         addObject(obj9, objects, gameCamera);
 
+        obj7.string = "Real";
+        obj7.font = new Font("Times New Roman", Font.BOLD, 160);
+
         obj8.image = pathToBufferedImage("res/img/icon.jpg");
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
@@ -130,7 +133,7 @@ public class Main {
         screenWidth = frame.getBounds().width;
         screenHeight = frame.getBounds().height;
 
-        gameCamera.dts = screenWidth + screenHeight - 500;
+        gameCamera.dts = screenWidth + screenHeight - 600;
 
         if (gameCamera.rotation.x < -90) {
             gameCamera.rotation.x = -90;
@@ -139,20 +142,20 @@ public class Main {
         }
 
         if (key.keys.get(KeyEvent.VK_A)) {
-            gameCamera.position.z += -5 * Math.sin(Math.toRadians(gameCamera.rotation.y));
-            gameCamera.position.x += -5 * Math.cos(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.z += -10 * Math.sin(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.x += -10 * Math.cos(Math.toRadians(gameCamera.rotation.y));
         }
         if (key.keys.get(KeyEvent.VK_D)) {
-            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y));
-            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.z += 10 * Math.sin(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.x += 10 * Math.cos(Math.toRadians(gameCamera.rotation.y));
         }
         if (key.keys.get(KeyEvent.VK_W)) {
-            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y + 90));
-            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y + 90));
+            gameCamera.position.z += 10 * Math.sin(Math.toRadians(gameCamera.rotation.y + 90));
+            gameCamera.position.x += 10 * Math.cos(Math.toRadians(gameCamera.rotation.y + 90));
         }
         if (key.keys.get(KeyEvent.VK_S)) {
-            gameCamera.position.z += 5 * Math.sin(Math.toRadians(gameCamera.rotation.y - 90));
-            gameCamera.position.x += 5 * Math.cos(Math.toRadians(gameCamera.rotation.y - 90));
+            gameCamera.position.z += 10 * Math.sin(Math.toRadians(gameCamera.rotation.y - 90));
+            gameCamera.position.x += 10 * Math.cos(Math.toRadians(gameCamera.rotation.y - 90));
         }
         if (key.keys.get(KeyEvent.VK_LEFT)) {
             gameCamera.rotation.y += 1;
@@ -211,13 +214,13 @@ public class Main {
 
     static void addObject(D3Obj object, ArrayList<D3Obj> objects, Camera camera) {
         objects.add(object);
-        renderer.renderObject(camera, object);
+        renderer.renderObject(camera, object, 20);
         graphics.objects.add(object.rendered);
     }
 
     static void updateObjects(D3Obj[] objects, Camera camera) {
         for (D3Obj obj : objects) {
-            obj.rendered = renderer.renderObject(camera, obj);
+            obj.rendered = renderer.renderObject(camera, obj, 20);
         }
     }
 
