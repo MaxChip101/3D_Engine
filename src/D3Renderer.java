@@ -40,7 +40,7 @@ public class D3Renderer {
             if (distance > 0 && Math.abs(distance) <= camera.renderDist) {
                 renderedObject.bounds = new Rectangle((int) ((rotatedPositions.x / 2) * camera.dts / rotatedPositions.z), (int) ((rotatedPositions.y / 2) * camera.dts / rotatedPositions.z), (int) ((object.size.x * distance / 10000) / scaleFactor), (int) ((object.size.y * distance / 10000) / scaleFactor));
                 double fixedRotation = Math.atan(renderedObject.bounds.x / (camera.dts / (camXSin / camXCos)) - renderedObject.bounds.y);
-                renderedObject.rotation = (int) fixedRotation;
+                renderedObject.rotation = (int) (fixedRotation + object.rotation);
                 if (renderedObject.font != null) {
                     renderedObject.font = new Font(object.font.getFontName(), object.font.getStyle(), (int) ((object.font.getSize() * Math.abs(distance) / 10000) / scaleFactor));
                 }
