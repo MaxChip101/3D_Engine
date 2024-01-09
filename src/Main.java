@@ -28,6 +28,7 @@ public class Main {
     public static final int FRAME_RATE = 120;
 
     // Mouse Variables
+
     public static boolean mouse1Down;
     public static boolean mouse1Released;
 
@@ -50,7 +51,8 @@ public class Main {
         frame.addKeyListener(key);
         frame.addMouseListener(mouse);
         frame.addMouseMotionListener(mouse);
-        Image icon = Toolkit.getDefaultToolkit().getImage("res/img/icon.jpg");
+        frame.setCursor(mouse.cursor);
+        Image icon = BeanTools.loadImage("res/img/icon.jpg");
         frame.setIconImage(icon);
         start();
         graphics.Begin();
@@ -71,22 +73,22 @@ public class Main {
     static D3Obj obj3 = new D3Obj(new D3(-500, 0, 1000), new Point(100, 100), 0, 0,"fillOval", new Color(255, 255, 0));
     static D3Obj obj4 = new D3Obj(new D3(-500, 0, 2000), new Point(100, 100), 0, 0,"fillOval", new Color(0, 255, 0));
     static D3Obj obj5 = new D3Obj(new D3(500, 1000, 1000), new Point(100, 100), 0, 10,"rect", new Color(255, 55, 0));
-    static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new Point(1000, 100), 0, 0,"fillRect", new Color(255, 0, 100));
+    static D3Obj obj6 = new D3Obj(new D3(500, 1000, 2000), new Point(1000, 100), 15, 0,"fillRect", new Color(255, 0, 100));
     static D3Obj obj7 = new D3Obj(new D3(-500, 1000, 1000), new Point(100, 100), 0, 0,"str", new Color(0, 255, 255));
     static D3Obj obj8 = new D3Obj(new D3(-500, 1000, 2000), new Point(100, 100), 0, 0,"img",new Color(150, 0, 200));
     static D3Obj obj9 = new D3Obj(new D3(-500, 1000, 1500), new Point(100, 100), 0, 0,"fillRect" ,new Color(150, 50, 200));
 
     static D3Line line1 = new D3Line(new D3(0, 50, 1000), new D3(0, 50, 2000), 10, new Color(0, 0, 0));
 
-    static D3Line wireframe1 = new D3Line(new D3(4000, 100, 5000), new D3(4000, 100, 4000), 10, new Color(0, 0, 0));
+    static D3Line wireframe1 = new D3Line(new D3(4000, 100, 5000), new D3(4000, 100, 4000), 10, new Color(255, 0, 0));
     static D3Line wireframe2 = new D3Line(new D3(4000, 100, 5000), new D3(5000, 100, 5000), 10, new Color(0, 0, 0));
     static D3Line wireframe3 = new D3Line(new D3(5000, 100, 5000), new D3(5000, 100, 4000), 10, new Color(0, 0, 0));
-    static D3Line wireframe4 = new D3Line(new D3(5000, 100, 4000), new D3(4000, 100, 4000), 10, new Color(0, 0, 0));
+    static D3Line wireframe4 = new D3Line(new D3(5000, 100, 4000), new D3(4000, 100, 4000), 10, new Color(255, 0, 0));
 
     static D3Line wireframe5 = new D3Line(new D3(4000, 100, 5000), new D3(4000, 1100, 5000), 10, new Color(0, 0, 0));
     static D3Line wireframe6 = new D3Line(new D3(4000, 100, 4000), new D3(4000, 1100, 4000), 10, new Color(0, 0, 0));
-    static D3Line wireframe7 = new D3Line(new D3(5000, 100, 5000), new D3(5000, 1100, 5000), 10, new Color(0, 0, 0));
-    static D3Line wireframe8 = new D3Line(new D3(5000, 100, 4000), new D3(5000, 1100, 4000), 10, new Color(0, 0, 0));
+    static D3Line wireframe7 = new D3Line(new D3(5000, 100, 5000), new D3(5000, 1100, 5000), 10, new Color(255, 0, 0));
+    static D3Line wireframe8 = new D3Line(new D3(5000, 100, 4000), new D3(5000, 1100, 4000), 100, new Color(0, 0, 0));
 
     static D3Line wireframe9 = new D3Line(new D3(4000, 1100, 5000), new D3(4000, 1100, 4000), 10, new Color(0, 0, 0));
     static D3Line wireframe10 = new D3Line(new D3(4000, 1100, 5000), new D3(5000, 1100, 5000), 10, new Color(0, 0, 0));
@@ -94,13 +96,7 @@ public class Main {
     static D3Line wireframe12 = new D3Line(new D3(5000, 1100, 4000), new D3(4000, 1100, 4000), 10, new Color(0, 0, 0));
 
 
-    /*
-    base:
-    1: 0, 100, 0, 0;
-    2,
-
-
-     */
+    static BeanObj sky = new BeanObj();
 
     static ArrayList<D3Obj> objects = new ArrayList<>();
     static ArrayList<D3Line> lines = new ArrayList<>();
@@ -116,6 +112,20 @@ public class Main {
         frame.setUndecorated(false);
         screenWidth = frame.getWidth();
         screenHeight = frame.getHeight();
+
+        sky.lineThickness = 0;
+        sky.bounds = new Rectangle(0, 0, screenWidth, screenHeight * 5);
+        sky.rotationOffset = new Point(0, 0);
+        sky.rotation = 0;
+        sky.color = new Color(0, 0 ,0);
+        sky.shape = "img";
+        sky.zindex = 100;
+        sky.image = BeanTools.loadImage("res/img/sky.jpg");
+
+        graphics.objects.add(sky);
+
+        mouse.setCursor("res/img/cursor.png", new Point(0, 0), "Bean_Cursor");
+        frame.setCursor(mouse.cursor);
 
         key.registerKey(KeyEvent.VK_DOWN);
         key.registerKey(KeyEvent.VK_RIGHT);
@@ -140,7 +150,7 @@ public class Main {
         addObject(obj4, objects, gameCamera);
         addObject(obj5, objects, gameCamera);
         addObject(obj6, objects, gameCamera);
-        addObject(obj7, objects, gameCamera);
+        //addObject(obj7, objects, gameCamera);
         addObject(obj8, objects, gameCamera);
         addObject(obj9, objects, gameCamera);
 
@@ -163,43 +173,39 @@ public class Main {
         obj7.string = "Real";
         obj7.font = new Font("Times New Roman", Font.BOLD, 160);
 
-        obj8.image = pathToBufferedImage("res/img/icon.jpg");
+        obj8.image = BeanTools.loadImage("res/img/icon.jpg");
+
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
 
     }
-
-    static boolean mouseCam = false;
     static float mouseSensitivity = 0.1f;
 
 
     static void update() {
+
+
+
         screenWidth = frame.getBounds().width;
         screenHeight = frame.getBounds().height;
 
-        gameCamera.dts = screenWidth + screenHeight - 500;
-
-        if (gameCamera.rotation.x <= -90) {
-            gameCamera.rotation.x = -89;
-        } else if (gameCamera.rotation.x >= 90) {
-            gameCamera.rotation.x = 89;
-        }
+        gameCamera.dts = screenWidth + screenHeight - 200;
 
         if (key.keys.get(KeyEvent.VK_A)) {
-            gameCamera.position.z += -50 * Math.sin(Math.toRadians(gameCamera.rotation.y));
-            gameCamera.position.x += -50 * Math.cos(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.z += (float) (-50 * Math.sin(Math.toRadians(gameCamera.rotation.y)));
+            gameCamera.position.x += (float) (-50 * Math.cos(Math.toRadians(gameCamera.rotation.y)));
         }
         if (key.keys.get(KeyEvent.VK_D)) {
-            gameCamera.position.z += 50 * Math.sin(Math.toRadians(gameCamera.rotation.y));
-            gameCamera.position.x += 50 * Math.cos(Math.toRadians(gameCamera.rotation.y));
+            gameCamera.position.z += (float) (50 * Math.sin(Math.toRadians(gameCamera.rotation.y)));
+            gameCamera.position.x += (float) (50 * Math.cos(Math.toRadians(gameCamera.rotation.y)));
         }
         if (key.keys.get(KeyEvent.VK_W)) {
-            gameCamera.position.z += 50 * Math.sin(Math.toRadians(gameCamera.rotation.y + 90));
-            gameCamera.position.x += 50 * Math.cos(Math.toRadians(gameCamera.rotation.y + 90));
+            gameCamera.position.z += (float) (50 * Math.sin(Math.toRadians(gameCamera.rotation.y + 90)));
+            gameCamera.position.x += (float) (50 * Math.cos(Math.toRadians(gameCamera.rotation.y + 90)));
         }
         if (key.keys.get(KeyEvent.VK_S)) {
-            gameCamera.position.z += 50 * Math.sin(Math.toRadians(gameCamera.rotation.y - 90));
-            gameCamera.position.x += 50 * Math.cos(Math.toRadians(gameCamera.rotation.y - 90));
+            gameCamera.position.z += (float) (50 * Math.sin(Math.toRadians(gameCamera.rotation.y - 90)));
+            gameCamera.position.x += (float) (50 * Math.cos(Math.toRadians(gameCamera.rotation.y - 90)));
         }
         if (key.keys.get(KeyEvent.VK_LEFT)) {
             gameCamera.rotation.y += 1;
@@ -228,38 +234,27 @@ public class Main {
         if (key.keys.get(KeyEvent.VK_Z)) {
             obj1.position.y += 1;
         }
-        if (key.keys.get(KeyEvent.VK_F)) {
-            mouseCam = true;
-        }
-        if (key.keys.get(KeyEvent.VK_G)) {
-            mouseCam = false;
-        }
 
-        if (mouseCam) {
+        if (mouse3Down) {
             mouse.MoveCursor(new Point(frame.getX() + screenWidth / 2, frame.getY() + screenHeight / 2));
-            gameCamera.rotation.y += (screenWidth / 2 - mouseX) * mouseSensitivity;
-            gameCamera.rotation.x += (screenHeight / 2 - mouseY) * mouseSensitivity;
+            gameCamera.rotation.y += ((float) screenWidth / 2 - mouseX) * mouseSensitivity;
+            gameCamera.rotation.x += ((float) screenHeight / 2 - mouseY) * mouseSensitivity;
         }
 
-        System.out.println("x1: " + line1.rendered.bounds.x + " y1: " + line1.rendered.bounds.y + " x1: " + line1.rendered.bounds.width + " y2: " + line1.rendered.bounds.height);
-
+        if (gameCamera.rotation.x < -90) {
+            gameCamera.rotation.x = -90;
+        } else if (gameCamera.rotation.x > 90) {
+            gameCamera.rotation.x = 90;
+        }
 
         obj6.rotation += 10;
 
         updateObjects(objects.toArray(D3Obj[]::new), gameCamera);
         updateLines(lines.toArray(D3Line[]::new), gameCamera);
 
-    }
+        // TODO: build sky functionality
+        sky.bounds = new Rectangle(0, (int) ((gameCamera.rotation.x * gameCamera.dts / 100) - screenHeight * 2.5), screenWidth * 6, screenHeight * 6);
 
-    static BufferedImage pathToBufferedImage(String path) {
-        File file = new File(path);
-        try {
-            BufferedImage image = ImageIO.read(file);
-            return image;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     static void addObject(D3Obj object, ArrayList<D3Obj> objects, Camera camera) {
