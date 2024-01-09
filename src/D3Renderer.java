@@ -2,7 +2,7 @@ import java.awt.*;
 
 public class D3Renderer {
 
-    static BeanObj renderObject(Camera camera, D3Obj object, int zindexBreak) {
+    static BeanObj renderObject(Camera camera, D3Obj object, int zindexBuffer) {
         BeanObj renderedObject = object.rendered;
         renderedObject.color = object.color;
         renderedObject.image = object.image;
@@ -24,10 +24,10 @@ public class D3Renderer {
 
         double rotatedX = position.z * camYSin + position.x * camYCos;
         double rotatedZ = position.z * camYCos - position.x * camYSin;
-        double tempY = position.y * camXCos - rotatedZ * camXSin; // Adjusted for Z-axis rotation
-        double finalRotatedY = tempY * camZCos - rotatedX * camZSin; // Apply Z-axis rotation
-        double finalRotatedX = tempY * camZSin + rotatedX * camZCos; // Apply Z-axis rotation
-        double finalRotatedZ = position.y * camXSin + rotatedZ * camXCos; // Adjusted for Z-axis rotation
+        double tempY = position.y * camXCos - rotatedZ * camXSin;
+        double finalRotatedY = tempY * camZCos - rotatedX * camZSin;
+        double finalRotatedX = tempY * camZSin + rotatedX * camZCos;
+        double finalRotatedZ = position.y * camXSin + rotatedZ * camXCos;
 
 
         D3 rotatedPositions = new D3((int) finalRotatedX, (int) finalRotatedY , (int) finalRotatedZ);
@@ -36,20 +36,17 @@ public class D3Renderer {
 
         if (rotatedPositions.z != 0) {
             float distance = 100 * camera.dts / rotatedPositions.z;
-            renderedObject.zindex = (int) distance + zindexBreak;
+            renderedObject.zindex = (int) -distance + zindexBuffer;
             if (distance > 0) {
                 renderedObject.bounds = new Rectangle((int) ((rotatedPositions.x / 2) * camera.dts / rotatedPositions.z), (int) ((rotatedPositions.y / 2) * camera.dts / rotatedPositions.z), (int) ((object.size.x * distance / 10000) / scaleFactor), (int) ((object.size.y * distance / 10000) / scaleFactor));
-                double fixedRotation = Math.atan(renderedObject.bounds.x / (camera.dts / (camXSin / camXCos)) - renderedObject.bounds.y);
-                renderedObject.rotation = (int) (fixedRotation + object.rotation);
-                renderedObject.lineThickness = (int) ((object.lineThickness * distance / 10000) / scaleFactor);
-                if (renderedObject.font != null) {
-                    renderedObject.font = new Font(object.font.getFontName(), object.font.getStyle(), (int) ((object.font.getSize() * Math.abs(distance) / 10000) / scaleFactor));
-                }
+                renderedObject.rotation = (int) object.rotation;
+                renderedObject.lineThickness = (int) ((object.lineThickness * distance / 100000) / scaleFactor);
             }
         } else {
             renderedObject.bounds = new Rectangle(0, 0, 0, 0);
         }
 
+        // Centering the object
         int screenWidthHalf = Main.screenWidth / 2;
         int screenHeightHalf = Main.screenHeight / 2;
         renderedObject.bounds.x += screenWidthHalf - renderedObject.bounds.width / 2;
@@ -58,7 +55,7 @@ public class D3Renderer {
         return renderedObject;
     }
 
-    public BeanObj renderLine(Camera camera, D3Line line, int zindexBreak) {
+    public BeanObj renderLine(Camera camera, D3Line line, int zindexBuffer) {
         BeanObj renderedLine = line.rendered;
         renderedLine.color = line.color;
         renderedLine.shape = "ln";
@@ -94,27 +91,25 @@ public class D3Renderer {
         D3 rotatedPositions1 = new D3((int) finalRotatedX1, (int) finalRotatedY1, (int) finalRotatedZ1);
         D3 rotatedPositions2 = new D3((int) finalRotatedX2, (int) finalRotatedY2, (int) finalRotatedZ2);
 
-        float scaleFactor = 0.01f;
-
-
-
-        if (rotatedPositions1.z != 0 || rotatedPositions2.z != 0) {
+        if (rotatedPositions1.z >= 0 && rotatedPositions2.z >= 0) {
             float distance1 = 100 * camera.dts / rotatedPositions1.z;
             float distance2 = 100 * camera.dts / rotatedPositions2.z;
-            renderedLine.zindex = (int) (((distance1 + distance2) / 2) + zindexBreak);
+            renderedLine.zindex = (int) (-Math.max(distance1, distance2) + zindexBuffer);
             if (distance1 > 0 && distance2 > 0) {
                 renderedLine.bounds = new Rectangle((int) ((rotatedPositions1.x / 2) * camera.dts / rotatedPositions1.z), (int) ((rotatedPositions1.y / 2) * camera.dts / rotatedPositions1.z), (int) ((rotatedPositions2.x / 2) * camera.dts / rotatedPositions2.z), (int) ((rotatedPositions2.y / 2) * camera.dts / rotatedPositions2.z));
-                if (distance1 + distance2 / 2 > 1.0f) {
-                    renderedLine.lineThickness = (int) Math.max((line.lineThickness * ((distance1 + distance2) / 2) / 10000) / scaleFactor, 0.1f);
-                } else {
-                    renderedLine.lineThickness = 0;
-                }
+                renderedLine.lineThickness = (int) ((line.lineThickness * camera.dts / (Math.abs(rotatedPositions1.z - distance1) + Math.abs(rotatedPositions2.z - distance2)) / 2));
+            } else {
+                renderedLine.bounds = new Rectangle(0, 0, 0, 0);
+                renderedLine.lineThickness = 0;
+
             }
+
         } else {
             renderedLine.lineThickness = 0;
             renderedLine.bounds = new Rectangle(0, 0, 0, 0);
         }
 
+        // Centering the object
         int screenWidthHalf = Main.screenWidth / 2;
         int screenHeightHalf = Main.screenHeight / 2;
         renderedLine.bounds.x += screenWidthHalf;
