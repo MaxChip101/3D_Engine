@@ -1,8 +1,28 @@
 import java.awt.*;
 
 public class D3Renderer {
+    static double camYSin;
+    static double camYCos;
+    static double camXSin;
+    static double camXCos;
+    static double camZSin;
+    static double camZCos;
 
-    static BeanObj renderObject(Camera camera, D3Obj object, int zindexBuffer) {
+    static Camera camera;
+
+
+    public static void updateCamera(Camera renderingCamera) {
+        camYSin = -Math.sin(Math.toRadians(renderingCamera.rotation.y));
+        camYCos = -Math.cos(Math.toRadians(renderingCamera.rotation.y));
+        camXSin = -Math.sin(Math.toRadians(renderingCamera.rotation.x));
+        camXCos = -Math.cos(Math.toRadians(renderingCamera.rotation.x));
+        camZSin = -Math.sin(Math.toRadians(renderingCamera.rotation.z));
+        camZCos = -Math.cos(Math.toRadians(renderingCamera.rotation.z));
+
+        camera = renderingCamera;
+    }
+
+    public static BeanObj renderObject(D3Obj object, int zindexBuffer) {
         BeanObj renderedObject = object.rendered;
         renderedObject.color = object.color;
         renderedObject.image = object.image;
@@ -10,17 +30,10 @@ public class D3Renderer {
         renderedObject.font = object.font;
         renderedObject.shape = object.shape;
         renderedObject.rotationOffset = new Point(0, 0);
-        renderedObject.rotation = 0;
-        renderedObject.lineThickness = 0;
+        renderedObject.scene = object.scene;
 
         D3 position = new D3 (object.position.x - camera.position.x, -object.position.y - (-camera.position.y), object.position.z - camera.position.z);
 
-        double camYSin = -Math.sin(Math.toRadians(camera.rotation.y));
-        double camYCos = -Math.cos(Math.toRadians(camera.rotation.y));
-        double camXSin = -Math.sin(Math.toRadians(camera.rotation.x));
-        double camXCos = -Math.cos(Math.toRadians(camera.rotation.x));
-        double camZSin = -Math.sin(Math.toRadians(camera.rotation.z));
-        double camZCos = -Math.cos(Math.toRadians(camera.rotation.z));
 
         double rotatedX = position.z * camYSin + position.x * camYCos;
         double rotatedZ = position.z * camYCos - position.x * camYSin;
@@ -55,23 +68,15 @@ public class D3Renderer {
         return renderedObject;
     }
 
-    public BeanObj renderLine(Camera camera, D3Line line, int zindexBuffer) {
+    public static BeanObj renderLine(D3Line line, int zindexBuffer) {
         BeanObj renderedLine = line.rendered;
         renderedLine.color = line.color;
         renderedLine.shape = "ln";
         renderedLine.rotationOffset = new Point(0, 0);
-        renderedLine.rotation = 0;
-        renderedLine.lineThickness = 0;
+        renderedLine.scene = line.scene;
 
         D3 position1 = new D3 (line.position1.x - camera.position.x, -line.position1.y - (-camera.position.y), line.position1.z - camera.position.z);
         D3 position2 = new D3 (line.position2.x - camera.position.x, -line.position2.y - (-camera.position.y), line.position2.z - camera.position.z);
-
-        double camYSin = -Math.sin(Math.toRadians(camera.rotation.y));
-        double camYCos = -Math.cos(Math.toRadians(camera.rotation.y));
-        double camXSin = -Math.sin(Math.toRadians(camera.rotation.x));
-        double camXCos = -Math.cos(Math.toRadians(camera.rotation.x));
-        double camZSin = -Math.sin(Math.toRadians(camera.rotation.z));
-        double camZCos = -Math.cos(Math.toRadians(camera.rotation.z));
 
         double rotatedX1 = position1.z * camYSin + position1.x * camYCos;
         double rotatedZ1 = position1.z * camYCos - position1.x * camYSin;
